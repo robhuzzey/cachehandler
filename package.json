@@ -1,7 +1,8 @@
 {
-  "name": "node-example",
-  "version": "0.0.1",
-  "dependencies": {
-    "express": ">=2.2.0"
-  }
+	"name" : "robhuzzey-cachehandler",
+	"version" : "0.0.1",
+	"dependencies" : {
+		"express" : ">=2.2.0",
+		"mongodb": ">= 0.9.6-7"
+	}
 }
