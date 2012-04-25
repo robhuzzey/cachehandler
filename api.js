@@ -1,8 +1,6 @@
 
 // Required packages / files
 var private = require( './private/private.js' ),
-	http = require( 'http' ),
-	https = require( 'https' ),
 	express = require( 'express' ),
 	mongodb = require( 'mongodb' );
 
@@ -61,7 +59,7 @@ var App = function() {
 			
 			if( conn ) {
 				// get the record from the collection that matches our hash
-				conn.collection( 'test', function( err, coll ) {
+				conn.collection( this.params.db.collection, function( err, coll ) {
 					coll.findOne( { 'hash' : params.hash }, function( err, result ) {
 					
 						if( self.cacheExpired( result ) || err ) {
@@ -84,15 +82,30 @@ var App = function() {
 			
 		},
 		
+		// TODO: Rather than return false, decided on whether the cache has expired using
+		// the mongoDB id as the cache creation date.
 		cacheExpired : function( obj ) {
 			
-			// Check the timestamp, if it's inside our cache expiry time
-			// then set the object to data
-			var timestamp = obj._id.toString().substring( 0, 8 );
-			var date = new Date( parseInt( timestamp, 16 ) * 1000 );
-			console.log( 'Cache Date: ' + date );
+			// default our return variable to true (shows we don't have a cache stored yet)
+			var ret = true;
 			
-			return false;
+			// If we don't have obj or obj doesn't have an _id
+			// then it hasn't been saved yet so let's set our return
+			// var to true here.
+			// Additional option to just switch cache off!
+			if( this.params.noCache || !obj || !obj._id ) {
+				ret = true;
+			} else {
+			
+				// Check the timestamp, if it's inside our cache expiry time
+				// then set the object to data
+				var timestamp = obj._id.toString().substring( 0, 8 );
+				var date = new Date( parseInt( timestamp, 16 ) * 1000 );
+				console.log( 'Cache Date: ' + date );
+				ret = false;
+			}
+			
+			return ret;
 			
 		},
 		
@@ -137,16 +150,21 @@ var App = function() {
 		},
 		
 		saveCache : function( params ) {
-			var conn = this.getConnection();			
-			if( conn && params.data ) {
-				conn.collection( 'test', function( err, coll ) {
-					var object_to_insert = { "hash" : params.hash, "data" : params.data };
-					coll.save( object_to_insert, { safe : true }, function( err ) {
-						console.log( 'saved cache' );
-						//params.callback( object_to_insert );
+		
+			if( this.params.noCache ) {
+				console.log( 'cache turned off' );	
+			} else {
+				var conn = this.getConnection();			
+				if( conn && params.data ) {
+					conn.collection( this.params.db.collection, function( err, coll ) {
+						var object_to_insert = { "hash" : params.hash, "data" : params.data };
+						coll.save( object_to_insert, { safe : true }, function( err ) {
+							console.log( 'saved cache' );
+							//params.callback( object_to_insert );
+						});
 					});
-				});
-			}			
+				}
+			}		
 		}
 		
 	};
@@ -177,13 +195,16 @@ server.get( /^\/([a-zA-Z0-9]+)(.*)/, function( request, response ) {
 			app.init({
 				"db" : {
 					"conn" : conn,
-					"error" : err
+					"error" : err,
+					"collection" : "robhuzzey"
 				},
 				"server" : {
 					"request" : request,
 					"response" : response
 				},
-				"apis" : apis
+				"apis" : apis,
+				
+				"noCache" : true
 			});
 			
 			// Start by trying to get the cache
