@@ -1,3 +1,19 @@
+/*
+	I need help here... 
+	
+	This works for the following urls (assuming you are running node in localhost:5000)
+	http://localhost:5000/delicious/v2/json/djhuzz?count=100
+	http://localhost:5000/google/books/v1/users/101891936560271534706/bookshelves/4/volumes?maxResults=40
+	
+	But NOT on:
+	http://localhost:5000/twitter/1/statuses/user_timeline.json?screen_name=theHuzz
+	
+	I just get a 'not authorised' message....
+	
+	If you can figure this out, I would be very happy :)
+
+*/
+
 
 // Required packages / files
 var private = require( './private/private.js' ),
