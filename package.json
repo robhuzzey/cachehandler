@@ -1,6 +1,10 @@
 {
 	"name" : "robhuzzey-cachehandler",
-	"version" : "0.0.1",
+	"version" : "0.0.2",
+	"engines": {
+		"node": "0.6.x",
+		"npm":  "1.0.x"
+	}
 	"dependencies" : {
 		"express" : ">=2.2.0",
 		"mongodb": ">= 0.9.6-7"
