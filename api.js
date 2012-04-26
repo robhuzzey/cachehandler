@@ -126,20 +126,17 @@ var App = function() {
 		},
 		
 		getApi : function( callback ) {
+						
+			var url = this.params.server.request.url.match(/^\/(\w*)\/(.*)/);
+			var provider = url[1];
+			var endpoint = url[2];
 			
-			// Break down our url	
-			var provider = this.params.server.request.params[0];
-			var endpoint = this.params.server.request.params[1];
-				
 			// The options hash for the api request
 			var options = {
 				host: this.params.apis[provider].host,
 				port: this.params.apis[provider].port,
-				path: endpoint,
-				method: 'GET',
-				headers: {
-		    		Host: this.params.apis[provider].host
-		  		}
+				path: '/' + endpoint,
+				method: 'GET'
 			}
 			
 			var data = '';
@@ -194,12 +191,13 @@ var App = function() {
 var server = express.createServer( express.logger() );
 
 // Initialize the server
-server.get( /^\/([a-zA-Z0-9]+)(.*)/, function( request, response ) {
+server.get( '*' , function( request, response ) {
 
-	var app = new App();
+	if( request.params[0] != '/favicon.ico' ) {
 
-	if( request.params[1] != '.ico' ) {
-
+		var app = new App();
+	
+	
 		// Make a unique identifier for the request
 		var hash = require( 'crypto' ).createHash( 'md5' ).update( request.url ).digest( 'hex' );
 	
@@ -253,7 +251,7 @@ server.get( /^\/([a-zA-Z0-9]+)(.*)/, function( request, response ) {
 			});
 			
 		});
-	
+
 	}
 	
 });
