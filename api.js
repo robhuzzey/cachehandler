@@ -25,23 +25,6 @@ var apis = {
 // Hold the collection in mongoDB I am using
 var collection = 'robhuzzey';
 
-// Simple cache checker function
-var cacheExpired = function( obj ) {
-
-	// Hold the lastmodified date that could be created date if new item
-	var lastModified = obj.modified ? obj.modified : obj.created;
-	
-	// Setup the expiry date
-	var expires = lastModified;
-	expires.setHours( expires.getHours() + 1 ); // 1 hour expiry
-	console.log( 'Expiry Date: ' + expires );
-	
-	// Check if our expiry date is after now (returns bool)
-	return ( new Date() > expires );
-	
-};
-
-
 var appHelpers = function( mongoDBconn, collection ) {
 
 	return {
