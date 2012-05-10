@@ -1,5 +1,5 @@
 // Some sensitive info - Hate doing it like this but no choice due to how Heroku works :(
-var private = process.env.twitterScreenName ? require( './private/private.js' ) : { twitter : {}, mongolab : {} };
+var private = process.env.twitterScreenName ? { twitter : {}, mongolab : {} } : require( './private/private.js' );
 private.twitter.screen_name = private.twitter.screen_name || process.env.twitterScreenName;
 private.mongolab.apiKey = private.mongolab.apiKey || process.env.mongoLabApiKey;
 private.mongolab.uri = private.mongolab.uri || process.env.mongoLabUri;
