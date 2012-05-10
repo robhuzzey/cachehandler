@@ -2,8 +2,8 @@
 	"name" : "robhuzzey-cachehandler",
 	"version" : "0.0.2",
 	"engines" : {
-		"node" : "0.6.16",
-		"npm" :  "1.0.9"
+		"node" : ">=0.6.16",
+		"npm" :  ">=1.0.9"
 	}
 	"dependencies" : {
 		"express" : ">=2.2.0",
