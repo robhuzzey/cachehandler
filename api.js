@@ -119,6 +119,11 @@ server.get( '*' , function( request, response ) {
 	// Quick fix to prevent the .ico file triggering this code
 	if( request.params[0] != '/favicon.ico' ) {
 	
+	
+		response.header("Access-Control-Allow-Origin", "*");
+    	response.header("Access-Control-Allow-Headers", "X-Requested-With");
+	
+	
 		// Make a unique identifier for the request
 		var hash = require( 'crypto' ).createHash( 'md5' ).update( request.url ).digest( 'hex' );	
 		
