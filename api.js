@@ -37,7 +37,7 @@ var appHelpers = function( mongoDBconn, collection ) {
 		conn : mongoDBconn,
 		
 		getCache : function( options ) {
-			// If we have a connection, let's try and get the cache, otherswise drop right into erro callback
+			// If we have a connection, let's try and get the cache, otherswise drop right into error callback
 			if( this.conn ) {
 				var self = this;
 				self.conn.collection( collection, function( err, coll ) {
@@ -144,6 +144,7 @@ server.get( '*' , function( request, response ) {
 					var url = request.url.match(/^\/(\w*)\/(.*)/);
 					var provider = url[1];
 					var endpoint = url[2];
+					var error = null;
 					
 					// The options hash for the api request
 					var options = {
@@ -166,14 +167,32 @@ server.get( '*' , function( request, response ) {
 						
 						// Once the api has finished, send output & save the cache
 						res.on( 'end', function() {
-							console.log( 'got from api' );
-							response.send( data );
-							
-							helper.saveCache({
-								"hash" : hash,
-								"data" : data,
-								"mongoObj" : mongoObj
-							});
+						
+							if( data ) {
+								// See if we have an error
+								error = JSON.parse( data ).error;
+							}
+												
+							// If the data errors or is empty, return last know good state
+							if( !data || error ) {
+								
+								console.log( 'The API returned an error : ' );
+								console.log( error );
+								console.log( 'Returning last known good state' );
+								response.send( mongoObj.data );
+								
+							} else {
+												
+								console.log( 'got from api' );
+								response.send( data );
+	
+								helper.saveCache({
+									"hash" : hash,
+									"data" : data,
+									"mongoObj" : mongoObj
+								});
+								
+							}
 							
 						});
 					});
