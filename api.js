@@ -39,7 +39,7 @@ var endpoints = {
 		"links" : "v2/json/djhuzz?count=100"
 	},
 	"google" : {
-		"bookshaveread" : "v1/users/101891936560271534706/bookshelves/4/volumes?country=GB&maxResults=40"
+		"bookshaveread" : "books/v1/users/101891936560271534706/bookshelves/4/volumes?country=GB&maxResults=40"
 	}
 };
 
