@@ -167,7 +167,7 @@ server.get( '*' , function( request, response ) {
 					var options = {
 						host: apis[provider].host,
 						port: apis[provider].port,
-						path: '/' + endpoints[endpoint],
+						path: '/' + endpoints[provider][endpoint],
 						method: 'GET'
 					}
 					
