@@ -27,6 +27,23 @@ var apis = {
 	}
 };
 
+
+var endpoints = {
+	"twitter" : {
+		"favourites" : "1/favorites/20645306.json",
+		"statuses" : "1/statuses/user_timeline.json?screen_name=theHuzz&exclude_replies=true&trim_user=true",
+		"friends" : "1/friends/ids.json?screen_name=theHuzz",
+		"user" : "1/users/show.json?screen_name=theHuzz"
+	},
+	"delicious" : {
+		"links" : "v2/json/djhuzz?count=100"
+	},
+	"google" : {
+		"booksHaveRead" : "v1/users/101891936560271534706/bookshelves/4/volumes?country=GB&maxResults=40"
+	}
+};
+
+
 // Hold the collection in mongoDB I am using
 var collection = 'robhuzzey';
 
@@ -121,7 +138,7 @@ server.get( '*' , function( request, response ) {
 	
 	
 		response.header("Access-Control-Allow-Origin", "*");
-    	response.header("Access-Control-Allow-Headers", "X-Requested-With");
+    response.header("Access-Control-Allow-Headers", "X-Requested-With");
 	
 	
 		// Make a unique identifier for the request
@@ -150,7 +167,7 @@ server.get( '*' , function( request, response ) {
 					var options = {
 						host: apis[provider].host,
 						port: apis[provider].port,
-						path: '/' + endpoint,
+						path: '/' + endpoints[endpoint],
 						method: 'GET'
 					}
 					
