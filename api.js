@@ -159,72 +159,78 @@ server.get( '*' , function( request, response ) {
 					
 					// Break down the request url into parts we need	
 					var url = request.url.match(/^\/(\w*)\/(.*)/);
-					var provider = url[1];
-					var endpoint = url[2];
-					var error = null;
+					var provider = ( url && url.length > 1 ) ? url[1] : null;
+					var endpoint = ( url && url.length > 1 ) ? url[2] : null;
+					var error = null;					
 					
-					// The options hash for the api request
-					var options = {
-						host: apis[provider].host,
-						port: apis[provider].port,
-						path: '/' + endpoints[provider][endpoint],
-						method: 'GET'
-					}
+					if( apis[provider] === undefined || endpoints[provider] === undefined || endpoints[provider][endpoint] === undefined ) {
+						response.send( 'No path matched' );
+						console.log( 'apis', apis );
+						console.log( 'provider', provider );
+						console.log( 'endpoint', endpoint );
+					} else {
 					
-					var data = '';
+						// The options hash for the api request
+						var options = {
+							host: apis[provider].host,
+							port: apis[provider].port,
+							path: '/' + endpoints[provider][endpoint],
+							method: 'GET'
+						}
 					
-					// The API request
-					var req = require( apis[provider].protocol ).request( options, function( res ) {
-						res.setEncoding( 'utf8' );
-						
-						// Build up the response in data
-						res.on( 'data', function( chunk ) {
-							data += chunk;
+						var data = '';
+
+						// The API request
+						var req = require( apis[provider].protocol ).request( options, function( res ) {
+							res.setEncoding( 'utf8' );
+
+							// Build up the response in data
+							res.on( 'data', function( chunk ) {
+								data += chunk;
+							});
+
+							// Once the api has finished, send output & save the cache
+							res.on( 'end', function() {
+
+								if( data ) {
+									// See if we have an error
+									error = JSON.parse( data ).error;
+								}
+
+								// If the data errors or is empty, return last know good state
+								if( !data || error ) {
+
+									console.log( 'The API returned an error : ' );
+									console.log( error );
+									console.log( 'Returning last known good state' );
+									response.send( mongoObj.data );
+
+								} else {
+
+									console.log( 'got from api' );
+									response.send( data );
+
+									helper.saveCache({
+										"hash" : hash,
+										"data" : data,
+										"mongoObj" : mongoObj
+									});
+
+								}
+
+							});
 						});
-						
-						// Once the api has finished, send output & save the cache
-						res.on( 'end', function() {
-						
-							if( data ) {
-								// See if we have an error
-								error = JSON.parse( data ).error;
-							}
-												
-							// If the data errors or is empty, return last know good state
-							if( !data || error ) {
-								
-								console.log( 'The API returned an error : ' );
-								console.log( error );
-								console.log( 'Returning last known good state' );
-								response.send( mongoObj.data );
-								
-							} else {
-												
-								console.log( 'got from api' );
-								response.send( data );
-	
-								helper.saveCache({
-									"hash" : hash,
-									"data" : data,
-									"mongoObj" : mongoObj
-								});
-								
-							}
-							
-						});
-					});
-					
-					// End the request on the api
-					req.end();			
+
+						// End the request on the api
+						req.end();			
+				
+					}	
 				
 				}
 				
-			});
-				
-				
+			});	
 			
-		});
-			
+		});	
 	
 	}
 	
