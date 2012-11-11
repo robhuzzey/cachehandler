@@ -164,7 +164,16 @@ server.get( '*' , function( request, response ) {
 					var error = null;					
 					
 					if( apis[provider] === undefined || endpoints[provider] === undefined || endpoints[provider][endpoint] === undefined ) {
-						response.send( 'No path matched' );
+						
+						// List all potential routes
+						var routes = [];
+						for( var end in endpoints ) {
+							for( var point in endpoints[end] ) {
+								routes.push( 'get::/' + end + '/' + point );
+							}
+						}
+						
+						response.send( 'No path matched, <br />Routes:<br />' + routes.join( '<br />' ) );
 						console.log( 'apis', apis );
 						console.log( 'provider', provider );
 						console.log( 'endpoint', endpoint );
